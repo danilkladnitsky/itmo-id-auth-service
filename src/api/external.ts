@@ -28,7 +28,10 @@ export const sendUserData = async (data) => {
   }
 
   try {
-    await axios.post(CALLBACK_URL, { ...data }, { headers });
+    await axios.get(CALLBACK_URL, {
+      params: { ...data },
+      headers,
+    });
   } catch (error) {
     console.log(error);
     throw new BadRequestException({
