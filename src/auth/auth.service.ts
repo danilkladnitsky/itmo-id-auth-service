@@ -48,7 +48,7 @@ export class AuthService {
         headers,
       });
 
-      const user = { ...res.data };
+      const user = { ...res.data, access_token };
 
       await sendUserData(user);
 
