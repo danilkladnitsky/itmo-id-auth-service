@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  auth_service:
+    container_name: auth_service
+    command: npm run start:dev
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: .
+      target: development
+    volumes:
+      - ./:/usr/src/auth_service
+      - ./node_modules:/usr/src/auth_service/node_modules
+    ports:
+      - 4000:4000
