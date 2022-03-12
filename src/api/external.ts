@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import axios from 'axios';
-import { headers } from '../const/itmo.id.headers';
+import { headers } from '../const/callback.api.header';
 
 const { CALLBACK_URL } = process.env;
 export const sendAcessToken = async (access_token: string, code: string) => {
