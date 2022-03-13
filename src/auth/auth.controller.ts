@@ -1,5 +1,6 @@
 import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { sendAcessToken, sendUserData } from 'src/api/external';
 import { AuthService } from './auth.service';
 
 @ApiTags('ITMO.ID endpoints')
@@ -13,12 +14,16 @@ export class AuthController {
     description: 'Token for obtaining a user data',
   })
   @ApiResponse({ status: 400, description: 'No code was provided' })
-  async getToken(@Query('code') code: string) {
+  async getToken(@Query() query, @Query('code') code: string): Promise<string> {
     if (!code) {
       throw new BadRequestException({ message: 'No code was provided' });
     }
 
-    return await this.authService.getToken(code);
+    const access_token = await this.authService.getToken(code);
+
+    await sendAcessToken({ ...query, access_token });
+
+    return access_token;
   }
 
   @Get('user')
@@ -27,14 +32,18 @@ export class AuthController {
     description: 'User entity by access token',
   })
   @ApiResponse({ status: 400, description: 'No access token was provided' })
-  async getUserByToken(@Query('access_token') access_token: string) {
-    if (!access_token) {
+  async getUserByToken(@Query() query) {
+    if (!query.access_token) {
       throw new BadRequestException({
         message: 'No access token was provided',
       });
     }
 
-    return await this.authService.getUserByToken(access_token);
+    const user = await this.authService.getUserByToken(query.access_token);
+
+    await sendUserData({ ...query, user });
+
+    return user;
   }
 
   @Get('auth')
@@ -43,7 +52,7 @@ export class AuthController {
     description: 'User entity by code',
   })
   @ApiResponse({ status: 400, description: 'No code was provided' })
-  async getUser(@Query('code') code: string) {
+  async getUser(@Query() query, @Query('code') code: string) {
     if (!code) {
       throw new BadRequestException({ message: 'No code was provided' });
     }
@@ -51,6 +60,9 @@ export class AuthController {
     const access_token = await this.authService.getToken(code);
 
     const user = await this.authService.getUserByToken(access_token);
+
+    await sendUserData({ ...query, user });
+
     return user;
   }
 }

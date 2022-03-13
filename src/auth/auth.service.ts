@@ -5,10 +5,10 @@ import {
   getUserDataRequest,
 } from 'src/const/itmo.id.requests';
 import { headers, headersWithAccessToken } from 'src/const/itmo.id.headers';
-import { sendAcessToken, sendUserData } from 'src/api/external';
 
 import axios from 'axios';
 import { data } from 'src/const/itmo.id.data';
+import { logRequests } from 'src/const/internal.variables';
 
 @Injectable()
 export class AuthService {
@@ -29,11 +29,9 @@ export class AuthService {
 
       const { access_token } = res.data;
 
-      await sendAcessToken(access_token, code);
-
       return access_token as string;
     } catch (err) {
-      console.log(err);
+      console.log(logRequests ? err : 'logging was disabled');
       throw new InternalServerErrorException({
         message: "Can't receive acess token",
       });
@@ -48,13 +46,11 @@ export class AuthService {
         headers,
       });
 
-      const user = { ...res.data, access_token };
-
-      await sendUserData(user);
+      const user = { ...res.data };
 
       return await generateToken(user);
     } catch (err) {
-      console.log(err);
+      console.log(logRequests ? err : 'logging was disabled');
       throw new InternalServerErrorException({
         message: "Can't receive user",
       });
