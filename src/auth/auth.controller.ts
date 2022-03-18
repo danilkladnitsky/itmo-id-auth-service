@@ -61,7 +61,7 @@ export class AuthController {
 
     const user = await this.authService.getUserByToken(access_token);
 
-    await sendUserData({ ...query, user });
+    await sendUserData({ ...query, user_itmo: user });
 
     return { status: 'ok', message: 'auth was completed' };
   }

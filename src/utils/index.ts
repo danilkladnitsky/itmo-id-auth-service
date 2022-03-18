@@ -2,16 +2,12 @@ import { InternalServerErrorException } from '@nestjs/common';
 
 const jwt = require('jsonwebtoken');
 
-export const generateToken = async (user) => {
+export const generateToken = async (data) => {
   try {
-    return await jwt.sign(
-      { id: user.id, name: user.name },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: '5m',
-        algorithm: 'HS384',
-      },
-    );
+    return await jwt.sign(data, process.env.JWT_SECRET, {
+      expiresIn: '5m',
+      algorithm: 'HS384',
+    });
   } catch (error) {
     console.log(error);
 
