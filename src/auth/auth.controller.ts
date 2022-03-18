@@ -14,7 +14,7 @@ export class AuthController {
     description: 'Token for obtaining a user data',
   })
   @ApiResponse({ status: 400, description: 'No code was provided' })
-  async getToken(@Query() query, @Query('code') code: string): Promise<string> {
+  async getToken(@Query() query, @Query('code') code: string) {
     if (!code) {
       throw new BadRequestException({ message: 'No code was provided' });
     }
@@ -23,7 +23,7 @@ export class AuthController {
 
     await sendAcessToken({ ...query, access_token });
 
-    return access_token;
+    return { status: 'ok', message: 'token was received' };
   }
 
   @Get('user')
@@ -43,7 +43,7 @@ export class AuthController {
 
     await sendUserData({ ...query, user });
 
-    return user;
+    return { status: 'ok', message: 'user was received' };
   }
 
   @Get('auth')
@@ -63,6 +63,6 @@ export class AuthController {
 
     await sendUserData({ ...query, user });
 
-    return user;
+    return { status: 'ok', message: 'auth was completed' };
   }
 }
