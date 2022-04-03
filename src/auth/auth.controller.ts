@@ -1,8 +1,18 @@
-import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Query,
+  Res,
+} from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { sendAcessToken, sendUserData } from 'src/api/external';
 import { AuthService } from './auth.service';
 
+const { REDIRECT_URL } = process.env;
+
+const REDIRECT_FAIL_QUERY = '?status=fail';
+const REDIRECT_OK_QUERY = '?status=ok';
 @ApiTags('ITMO.ID endpoints')
 @Controller()
 export class AuthController {
@@ -52,7 +62,7 @@ export class AuthController {
     description: 'User entity by code',
   })
   @ApiResponse({ status: 400, description: 'No code was provided' })
-  async getUser(@Query() query, @Query('code') code: string) {
+  async getUser(@Query() query, @Query('code') code: string, @Res() res) {
     if (!code) {
       throw new BadRequestException({ message: 'No code was provided' });
     }
@@ -62,6 +72,12 @@ export class AuthController {
     const user = await this.authService.getUserByToken(access_token);
 
     await sendUserData({ ...query, user_itmo: user });
+
+    // handling redirect
+
+    if (REDIRECT_URL) {
+      res.redirect(REDIRECT_URL + REDIRECT_OK_QUERY);
+    }
 
     return { status: 'ok', message: 'auth was completed' };
   }
